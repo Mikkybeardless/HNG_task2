@@ -16,7 +16,7 @@ const OrgModel = (sequelize, DataTypes) => {
       },
       description: {
         type: DataTypes.STRING,
-        allowNull: false,
+        defaultValue: "No description provided",
       },
     },
     {

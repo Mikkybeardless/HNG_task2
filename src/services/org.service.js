@@ -1,34 +1,28 @@
 import db from "../models/index.js";
-import { ErrorWithStatus } from "../exception/errorWithStatus.exception.js";
+import { ErrorWithStatus } from "../exceptions/errorWithStatus.eception.js";
 
 const Orgs = db.Orgs;
 const UserOrganization = db.UserOrgs;
 
 export const addUserToOrg = async (orgId, userId) => {
   try {
-    // Check if the organization exists
+    // Checking if the organization exists
     const organization = await Orgs.findByPk(orgId);
     if (!organization) {
       throw new ErrorWithStatus("Organization not found", 404);
     }
 
-    // Check if the user is already a member of the organization
-    const existingMembership = await models.UserOrganization.findOne({
-      where: {
-        userId,
-        orgId,
-      },
+    // Checking if the user is already a member of the organization
+    const userOrg = await UserOrganization.findOne({
+      where: { orgId, userId },
     });
-
-    if (existingMembership) {
-      throw new ErrorWithStatus("user exist in organization", 404);
+    if (userOrg) {
+      throw new ErrorWithStatus(
+        "User already a member of this organization",
+        400
+      );
     }
-
-    // Add a new membership (row in UserOrganization)
-    const org = await UserOrganization.create({
-      userId,
-      orgId,
-    });
+    const org = await organization.addUser(userId);
 
     return org;
   } catch (error) {
@@ -37,12 +31,13 @@ export const addUserToOrg = async (orgId, userId) => {
   }
 };
 
-export const createNewOrg = async (name, desc) => {
+export const createNewOrg = async (name, description, userId) => {
   try {
     const newOrg = await Orgs.create({
       name,
-      desc,
+      description,
     });
+    newOrg.addUser(userId);
 
     return newOrg;
   } catch (error) {
@@ -53,7 +48,7 @@ export const createNewOrg = async (name, desc) => {
 
 export const getOrgById = async (orgId) => {
   try {
-    const org = await Orgs.findById(orgId);
+    const org = await Orgs.findByPk(orgId);
     if (!org) {
       console.error("Organization with this id not found");
       throw new ErrorWithStatus("Organization not found", 404);

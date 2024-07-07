@@ -1,22 +1,27 @@
 import { Router } from "express";
 import * as orgController from "../controllers/org.controller.js";
-import { adminMiddleware } from "../middlewares/admin.middleware.js";
 import { authMiddleware } from "../middlewares/auth.middleware.js";
-import { or } from "sequelize";
+import { generateMiddleware } from "../middlewares/route.middleware.js";
+import {
+  orgSchema,
+  addMemberToOrgSchema,
+} from "../validation/org.validation.js";
 
 const orgRoute = Router();
 
-export default orgRoute;
+orgRoute.use(authMiddleware); // Protect all routes in this file
+orgRoute.get("/organisations", orgController.getAllUserOrgs);
+orgRoute.get("/organisations/:orgId", orgController.getUserOrgById);
 
-orgRoute.get("/organisations", authMiddleware, orgController.getAllUserOrgs);
-orgRoute.get(
-  "organisations/:orgId",
-  authMiddleware,
-  orgController.getUserOrgById
-);
+// middleware to validate request body
 orgRoute.post(
-  "organisations/:orgId/users",
-  authMiddleware,
+  "/organisations/:orgId/users",
+  generateMiddleware(addMemberToOrgSchema, "InvalidId"),
   orgController.addUserToOrg
 );
-orgRoute.post("/organisations", authMiddleware, orgController.createNewOrg);
+orgRoute.post(
+  "/organisations",
+  generateMiddleware(orgSchema, "Invalid organisation details"),
+  orgController.createNewOrg
+);
+export default orgRoute;

@@ -21,13 +21,16 @@ export const login = async (email, password) => {
     throw new ErrorWithStatus("Authentication failed", 401);
   }
 
+  const { firstName, userId } = user;
+
   // generate access tokren
   const JWT_SECRET = process.env.JWT_SECRET;
   const token = jwt.sign(
     {
+      firstName: firstName,
       email: user.email,
-      id: user._id,
-      sub: user._id,
+      id: userId,
+      sub: user.userId,
     },
     JWT_SECRET,
     { expiresIn: "1h" }

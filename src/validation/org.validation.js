@@ -1,15 +1,10 @@
 import Joi from "joi";
 
-export const loginSchema = Joi.object({
-  email: Joi.string().email().required(),
-  password: Joi.string().required(),
+export const orgSchema = Joi.object({
+  name: Joi.string().required(),
+  description: Joi.string(),
 });
 
-export const registerSchema = Joi.object({
-  first_name: Joi.string().required(),
-  last_name: Joi.string().required(),
-  email: Joi.string().email().required(),
-  password: Joi.string().min(3).required(),
-  confirmPassword: Joi.string().valid(Joi.ref("password")).required(),
-  role: Joi.string().valid("USER", "ADMIN"),
+export const addMemberToOrgSchema = Joi.object({
+  userId: Joi.string().required(),
 });
