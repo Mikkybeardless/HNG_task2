@@ -3,7 +3,7 @@ import request from "supertest";
 import app from "../src/app.js";
 import db from "../src/models/index";
 
-const { Users, sequelize } = db;
+const { Users, Orgs, sequelize } = db;
 
 describe("E2E tests", () => {
   jest.setTimeout(20000);
@@ -27,7 +27,7 @@ describe("E2E tests", () => {
 
   it("should not be able to login", async () => {
     await clearDB();
-    const res = await request(app).post("/auth/sign_in").send({
+    const res = await request(app).post("/auth/login").send({
       email: "test@yahoo.com",
       password: "password",
     });
@@ -37,85 +37,71 @@ describe("E2E tests", () => {
     expect(res.body.status).toEqual("Bad request");
   });
 
-  it("should be able to sign up", async () => {
+  it("should register user successfully", async () => {
     await clearDB();
-    const res = await request(app).post("/auth/sign_up").send({
-      first_name: "James",
-      last_name: "Test User",
+    const res = await request(app).post("/auth/register").send({
+      firstName: "James",
+      lastName: "Test User",
       email: "mikky@gmail.com",
       password: "password",
-      confirmPassword: "password",
+      phone: "0903454987",
     });
 
     console.log(res.body);
     expect(res.statusCode).toEqual(201);
-    expect(res.body.message).toEqual("User created successfully");
-    expect(res.body.data.user).toHaveProperty("id");
-    expect(res.body.data.user).toHaveProperty("first_name");
-    expect(res.body.data.user.first_name).toEqual("James");
+    expect(res.body.message).toEqual("Registration successfully");
+    expect(res.body.data.user).toHaveProperty("userId");
+    expect(res.body.data.user.firstName).toEqual("James");
     expect(res.body.data.user).toHaveProperty("email");
     expect(res.body.data.user.email).toEqual("mikky@gmail.com");
+    expect(res.body.data).toHaveProperty("accessToken");
+    expect(res.body.data.user).not.toHaveProperty("password");
   });
 
-  it("should be able to sign in", async () => {
+  it("should login user successfully", async () => {
     await clearDB();
     await Users.create({
-      first_name: "Grace",
-      last_name: "Test User",
+      firstName: "Grace",
+      lastName: "Test User",
       email: "yam@gmail.com",
       password: await bcrypt.hash("password", 10),
+      phone: "0806758434",
     });
 
-    const res = await request(app).post("/auth/sign_in").send({
+    const res = await request(app).post("/auth/login").send({
       email: "yam@gmail.com",
       password: "password",
     });
 
     console.log(res.body);
     expect(res.statusCode).toEqual(200);
+    expect(res.body.status).toEqual("success");
     expect(res.body.message).toEqual("Login successful");
     expect(res.body.data).toHaveProperty("accessToken");
     expect(res.body.data).not.toHaveProperty("password");
   });
 
-  it("should not be able to sign in - invalid payload", async () => {
-    const res = await request(app).post("/auth/sign_in").send({
+  it("should fail to login user - Missing fields", async () => {
+    const res = await request(app).post("/auth/login").send({
       email: "test@mymail.com",
     });
 
     console.log(res.body);
     expect(res.statusCode).toEqual(400);
-    expect(res.body.message).toEqual("Validation Error");
+    expect(res.body.message).toEqual(
+      "Authentication failed due to invalid credentials"
+    );
     expect(res.body).toHaveProperty("errors");
   });
 
-  it("should not be able to create blog without token", async () => {
-    const res = await request(app).post("/blogs/create").send({
-      title: "The meg",
-      description: "This is the first test blog post",
-      author: "Igashi",
-      body: "welcome to test 1234. hope you get it.",
-    });
-
-    console.log(res.body);
-    expect(res.statusCode).toEqual(401);
-    expect(res.body.message).toEqual("Unauthorized");
-  });
-
-  it("should not be able to sign in - invalid payload", async () => {
-    const res = await request(app).post("/auth/sign_in").send({
+  it("should fail to register user- invalid payload", async () => {
+    const res = await request(app).post("/auth/register").send({
       email: "test@mymail.com",
     });
 
     console.log(res.body);
     expect(res.statusCode).toEqual(400);
-    expect(res.body.message).toEqual("Validation Error");
+    expect(res.body.message).toEqual("Registration unsuccesful");
     expect(res.body).toHaveProperty("errors");
-  });
-
-  it("should return all blogs", async () => {
-    const res = await request(app).get("/blogs").send();
-
-    expect(res.statusCode).toEqual(200);
   });
 });

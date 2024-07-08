@@ -5,18 +5,13 @@ import * as orgService from "../services/org.service.js";
 
 // database model import
 const Users = db.Users;
-
+const Orgs = db.Orgs;
 // get all organizations associated to a logged in user
 export const getAllUserOrgs = async (req, res) => {
   try {
     const userId = req.user.id; // get user id from query
 
-    const user = await Users.findByPk(userId, {
-      include: {
-        model: db.Orgs,
-        as: "organizations",
-      },
-    });
+    const user = await orgService.getAllUserOrgs(userId);
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });

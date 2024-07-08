@@ -2,6 +2,7 @@ import db from "../models/index.js";
 import { ErrorWithStatus } from "../exceptions/errorWithStatus.eception.js";
 
 const Orgs = db.Orgs;
+const Users = db.Users;
 const UserOrganization = db.UserOrgs;
 
 export const addUserToOrg = async (orgId, userId) => {
@@ -58,5 +59,21 @@ export const getOrgById = async (orgId) => {
   } catch (error) {
     console.error("Error fetching organization by id:", error);
     throw new ErrorWithStatus(error.message, 500);
+  }
+};
+
+export const getAllUserOrgs = async (userId) => {
+  try {
+    const user = await Users.findByPk(userId, {
+      include: {
+        model: Orgs,
+        as: "organisations",
+      },
+    });
+
+    return user;
+  } catch (error) {
+    console.log(error);
+    throw new ErrorWithStatus("Internal server error");
   }
 };

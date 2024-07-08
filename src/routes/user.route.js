@@ -4,6 +4,6 @@ import { authMiddleware } from "../middlewares/auth.middleware.js";
 
 const userRoute = Router();
 
-userRoute.get("/users/:userId", authMiddleware, userController.getUserById);
+userRoute.get("/:id", authMiddleware, userController.getUserById);
 
 export default userRoute;

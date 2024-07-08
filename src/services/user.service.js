@@ -1,5 +1,5 @@
 import db from "../models/index.js";
-import { ErrorWithStatus } from "../exception/errorWithStatus.exception.js";
+import { ErrorWithStatus } from "../exceptions/errorWithStatus.eception.js";
 import _ from "lodash";
 
 const Users = db.Users;
@@ -15,6 +15,6 @@ export const getUserById = async (userId) => {
     return user;
   } catch (error) {
     console.error("Error fetching user useranizations:", error);
-    throw new ErrorWithStatus("useranization not found", 404);
+    throw new ErrorWithStatus(error.message, error.status);
   }
 };

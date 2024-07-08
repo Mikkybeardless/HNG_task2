@@ -13,8 +13,8 @@ app.use(express.json());
 
 // Routes
 app.use("/auth", authRoute);
-app.use("/api", orgRoute);
-app.use("/api", userRoute);
+app.use("/api/organisation", orgRoute);
+app.use("/api/users", userRoute);
 
 app.get("/", (req, res) => {
   res.json({
