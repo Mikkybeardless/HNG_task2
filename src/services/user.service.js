@@ -3,6 +3,7 @@ import { ErrorWithStatus } from "../exceptions/errorWithStatus.eception.js";
 import _ from "lodash";
 
 const Users = db.Users;
+
 export const getUserById = async (userId) => {
   try {
     let user = await Users.findByPk(userId);
@@ -11,7 +12,7 @@ export const getUserById = async (userId) => {
       throw new ErrorWithStatus("user not found", 404);
     }
 
-    user = _.pick(user, ["firstName", "lastName", "email", "phone", "userId"]);
+    user = _.pick(user, ["firstName", "lastName", "email", "phone"]);
     return user;
   } catch (error) {
     console.error("Error fetching user useranizations:", error);

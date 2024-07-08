@@ -1,11 +1,6 @@
 import _ from "lodash";
-
-import db from "../models/index.js";
 import * as orgService from "../services/org.service.js";
 
-// database model import
-const Users = db.Users;
-const Orgs = db.Orgs;
 // get all organizations associated to a logged in user
 export const getAllUserOrgs = async (req, res) => {
   try {
@@ -19,7 +14,7 @@ export const getAllUserOrgs = async (req, res) => {
 
     res.status(200).json({
       message: "User organisations",
-      data: user.organisations,
+      data: user.organizations,
     });
   } catch (error) {
     console.error("Error fetching user organizations:", error);

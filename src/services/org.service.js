@@ -67,7 +67,7 @@ export const getAllUserOrgs = async (userId) => {
     const user = await Users.findByPk(userId, {
       include: {
         model: Orgs,
-        as: "organisations",
+        as: "organizations",
       },
     });
 
