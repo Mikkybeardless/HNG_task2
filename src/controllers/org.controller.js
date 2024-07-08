@@ -11,10 +11,15 @@ export const getAllUserOrgs = async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
+    let organizations = user.organizations;
 
+    organizations = _.map(organizations, (item) =>
+      _.pick(item, ["orgId", "name", "description"])
+    );
     res.status(200).json({
-      message: "User organisations",
-      data: user.organizations,
+      status: "Success",
+      message: "User organisations for logged in user",
+      data: { organisation: organizations },
     });
   } catch (error) {
     console.error("Error fetching user organizations:", error);
@@ -50,7 +55,10 @@ export const addUserToOrg = async (req, res) => {
     if (organization)
       res
         .status(200)
-        .json({ message: "User added to organization successfully" });
+        .json({
+          status: "success",
+          message: "User added to organization successfully",
+        });
   } catch (error) {
     console.error("Error adding user to organization:", error);
     res.status(400).json({ message: "Client error" });
