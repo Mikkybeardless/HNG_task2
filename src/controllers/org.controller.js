@@ -68,6 +68,7 @@ export const addUserToOrg = async (req, res) => {
 export const createNewOrg = async (req, res) => {
   try {
     let { name, description } = req.body;
+    const id = req.user.id
 
     let organization = await orgService.createNewOrg(name, description, id);
 
